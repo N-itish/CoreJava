@@ -47,40 +47,52 @@ public class FileChecker {
                 employee.setEmail(tokens[3]);
                 employee.setPhno(tokens[4]);
                 employee.setSalary(tokens[5]);
-                if(tokens[6].equalsIgnoreCase("1"))
-                {
-                    employee.setSalaryStatus(true);
-                }
-                else
-                {
-                    employee.setSalaryStatus(false);
-                }
-                }
-               // System.out.println(line);
-                    
-                    if(tokens[i] == null)
-                    {
-                        System.out.println(i + "/n");
+                   if (tokens[6].equalsIgnoreCase("1")) {
+                        employee.setSalaryStatus(true);
+                    } else {
+                        employee.setSalaryStatus(false);
                     }
-                    i++;
-                
-                
-                Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
-                Matcher m = p.matcher(employee.getEmail());
-                boolean matchFound = m.matches();   
-                if (matchFound) 
-                {
-                        System.out.println(employee.getEmail());
+                    Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
+                    Matcher m = p.matcher(employee.getEmail());
+                    boolean matchFound = m.matches();
+
+                    if (matchFound || !line.contains(" ")) {
+
+                        if ((employeeDao.getByID(employee.getId()) != 1) && (employeeDao.getByEmail(employee.getEmail()) != 1)) {
+                            employeeDao.insert(employee);
+                            ok.append(line + "\n");
+                        }
+                        else {
+                        broken.append(line + "\n");
+                        } 
+                    }
+                     else 
+                    {
+                        broken.append(line + "\n");
+                    }
                 }
-                
             }
-            dao.insert(employee);
-            
-            
-        } catch (IOException ex) 
-        {
+            /*reader.close();                                                       //checks the list
+             employeeDao.getall().forEach(c->{
+             System.out.println(c);
+                        
+             });*/
+
+            System.out.println(broken);
+            System.out.println(ok);
+
+            FileWriter brokenfile = new FileWriter("E:/broken.csv");
+            brokenfile.write(broken.toString() + "\n");
+            brokenfile.close();
+
+            FileWriter okfile = new FileWriter("E:/ok.csv");
+            okfile.write(ok.toString());
+            okfile.close();
+
+        } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
     }
-    
+
 }
+
